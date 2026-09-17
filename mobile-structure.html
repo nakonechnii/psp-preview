@@ -1,0 +1,646 @@
+<title>PSP Mobile — структура дашборда</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#0e0d0b; --card:#161412; --raised:#1c1917;
+    --hair:rgba(255,255,255,.08); --hair-soft:rgba(255,255,255,.045);
+    --ink:#f1f0ed; --muted:#a39d96; --faint:#6b665f;
+    --amber:#eab866; --amber-dim:rgba(234,184,102,.14);
+    --ok:#5bbd74; --ok-dim:rgba(91,189,116,.13);
+    --bad:#e8605b; --bad-dim:rgba(232,96,91,.13);
+    --warn:#e8b45e; --warn-dim:rgba(232,180,94,.13);
+    --note:#8fb4d6; --note-dim:rgba(143,180,214,.12); --note-line:rgba(143,180,214,.35);
+    --sans:'Geist','Segoe UI',system-ui,sans-serif;
+    --mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ground);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+  .tnum{font-variant-numeric:tabular-nums}
+  .mono{font-family:var(--mono)}
+  .wrap{max-width:1400px;margin:0 auto;padding:40px 32px 80px}
+
+  h1{font-size:19px;font-weight:600;letter-spacing:-.01em}
+  h2{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);
+     margin:56px 0 18px;padding-bottom:10px;border-bottom:1px solid var(--hair-soft)}
+  .lede{color:var(--muted);font-size:13.5px;margin-top:8px;max-width:74ch}
+  .lede b{color:var(--ink);font-weight:500}
+
+  .principle{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:22px}
+  .principle div{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:16px 18px}
+  .principle strong{display:block;font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px;
+    text-transform:uppercase;letter-spacing:.05em}
+  .principle p{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+  /* refs */
+  .refs{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px}
+  .ref{background:var(--card);border:1px solid var(--hair);border-radius:12px;padding:16px 18px}
+  .ref h4{font-size:13px;font-weight:600;margin-bottom:3px}
+  .ref .cat{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .ref p{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .ref p b{color:var(--note);font-weight:500}
+
+  /* phone frames */
+  .phones{display:flex;gap:34px;align-items:flex-start;overflow-x:auto;padding-bottom:20px}
+  .col{flex:0 0 auto}
+  .col .cap{font-size:11.5px;color:var(--faint);margin-bottom:10px;display:flex;gap:8px;align-items:baseline}
+  .col .cap b{color:var(--ink);font-weight:600;font-size:12.5px}
+  .phone{background:var(--ground);border:1px solid var(--hair);border-radius:20px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .w375{width:375px} .w320{width:320px} .w768{width:768px}
+
+  /* app chrome inside phone */
+  .mtop{height:56px;display:flex;align-items:center;gap:12px;padding:0 14px;
+    border-bottom:1px solid var(--hair);background:var(--card);position:relative}
+  .mtop .burger{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--muted);
+    border:1px solid var(--hair)}
+  .mtop .brand{font-family:var(--mono);font-size:14px;font-weight:500}
+  .mtop .brand i{color:var(--faint);font-style:normal;font-weight:400}
+  .mtop .sp{flex:1}
+  .mtop .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--muted);position:relative}
+  .mtop .ic .dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--bad)}
+  .mtop .av{width:30px;height:30px;border-radius:50%;background:var(--amber-dim);color:var(--amber);
+    display:grid;place-items:center;font-size:11px;font-weight:600}
+
+  .mstrip{height:34px;display:flex;align-items:center;gap:10px;padding:0 16px;font-size:11.5px;color:var(--muted);
+    border-bottom:1px solid var(--hair-soft);background:var(--card)}
+  .mstrip .sep{color:var(--faint);opacity:.5}
+  .mstrip .on{color:var(--ok)}
+
+  .msticky{padding:10px 16px;border-bottom:1px solid var(--hair);background:rgba(22,20,18,.92);
+    backdrop-filter:blur(8px)}
+  .seg{display:flex;gap:3px;background:rgba(255,255,255,.045);border:1px solid var(--hair);
+    border-radius:11px;padding:3px}
+  .seg button{flex:1;height:36px;border:0;background:transparent;color:var(--muted);border-radius:8px;
+    font:500 13px var(--sans);cursor:default}
+  .seg button.on{background:rgba(255,255,255,.09);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .seg.sm button{height:32px;font-size:12.5px}
+  .seg button.ok.on{background:var(--amber-dim);color:var(--amber)}
+  .seg button.no.on{background:var(--bad-dim);color:var(--bad)}
+
+  .body{padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--ground)}
+  .w320 .body{padding:14px;gap:10px}
+
+  .ph{font-size:22px;font-weight:600;letter-spacing:-.01em}
+  .phrow{display:flex;align-items:center;justify-content:space-between}
+  .kebab{width:34px;height:34px;border-radius:9px;border:1px solid var(--hair);display:grid;place-items:center;color:var(--muted)}
+
+  .c{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:16px}
+  .c.p0{padding:0}
+  .lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .hero{font-size:40px;font-weight:600;letter-spacing:-.025em;line-height:1.05;margin-top:10px}
+  .w320 .hero{font-size:32px}
+  .unitrow{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .unit{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:500;color:var(--muted);
+    border:1px solid var(--hair);border-radius:8px;padding:4px 8px}
+  .pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;border-radius:999px;padding:3px 8px}
+  .pill.bad{background:var(--bad-dim);color:var(--bad)} .pill.good{background:var(--ok-dim);color:var(--ok)}
+  .meta{font-size:12px;color:var(--faint);margin-top:8px}
+  .hr{height:1px;background:var(--hair-soft);margin:14px -16px 0}
+  .h24{display:flex;align-items:center;justify-content:space-between;padding-top:12px}
+  .h24 .l{font-size:12px;color:var(--muted)}
+  .h24 .r{font-size:14px;font-weight:600}
+  .h24 .r i{font-style:normal;font-size:11px;color:var(--faint);font-weight:400;margin-left:4px}
+
+  /* rows */
+  .row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--hair-soft)}
+  .row:last-child{border-bottom:0}
+  .row .chip{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto}
+  .chip.warn{background:var(--warn-dim);color:var(--warn)}
+  .chip.bad{background:var(--bad-dim);color:var(--bad)}
+  .chip.n{background:rgba(255,255,255,.06);color:var(--faint)}
+  .chip.ok{background:var(--ok-dim);color:var(--ok)}
+  .row .n{font-size:15px;font-weight:600;flex:0 0 auto}
+  .row .n.warn{color:var(--warn)} .row .n.bad{color:var(--bad)}
+  .row .t{font-size:12.5px;color:var(--muted);flex:1;min-width:0;line-height:1.35}
+  .row .ch{color:var(--faint);flex:0 0 auto}
+
+  .sect{padding:14px 16px 4px;display:flex;align-items:baseline;justify-content:space-between}
+  .sect h5{font-size:13px;font-weight:600}
+  .sect .all{font-size:12px;color:var(--muted)}
+  .sect .sub{font-size:11.5px;color:var(--faint);margin-top:2px;font-weight:400}
+
+  /* conversion */
+  .conv{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
+  .conv .big{font-size:32px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .conv .big i{font-style:normal;font-size:13px;color:var(--muted);font-weight:500;margin-left:3px}
+  .splitbar{display:flex;height:7px;border-radius:999px;overflow:hidden;margin-top:14px;background:rgba(255,255,255,.05)}
+  .splitbar .a{background:var(--ok)} .splitbar .b{background:rgba(232,96,91,.6)}
+  .legs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .leg .k{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .leg .k s{width:7px;height:7px;border-radius:2px;text-decoration:none}
+  .leg .v{font-size:17px;font-weight:600;margin-top:4px}
+  .leg .v i{font-style:normal;font-size:10.5px;color:var(--faint);font-weight:400;margin-left:3px}
+  .leg .s{font-size:11px;color:var(--faint);margin-top:2px}
+  .queue{display:flex;align-items:center;gap:9px;margin:14px -16px -16px;padding:12px 16px;
+    border-top:1px solid var(--hair-soft);background:rgba(232,180,94,.05)}
+  .queue .q1{font-size:12px;color:var(--warn);font-weight:500}
+  .queue .q2{font-size:11.5px;color:var(--faint);margin-left:auto}
+
+  /* 2x2 alt */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tile{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px}
+  .tile .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+    display:flex;align-items:center;gap:7px}
+  .tile .v{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:10px}
+  .tile .v i{font-style:normal;font-size:11px;color:var(--muted);font-weight:500;margin-left:3px}
+  .tile .s{font-size:10.5px;color:var(--faint);margin-top:5px}
+
+  /* chart */
+  .chart{display:flex;align-items:flex-end;gap:4px;height:132px;margin-top:14px}
+  .chart .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+  .chart .b s{display:block;border-radius:2px;text-decoration:none}
+  .chart .b .o{background:rgba(255,255,255,.28)} .chart .b .r{background:rgba(232,96,91,.42)}
+  .xax{display:flex;gap:4px;margin-top:8px}
+  .xax span{flex:1;text-align:center;font-size:10px;color:var(--faint)}
+  .chartsum{display:flex;align-items:baseline;gap:8px;margin-top:12px}
+  .chartsum b{font-size:17px;font-weight:600} .chartsum i{font-style:normal;font-size:11.5px;color:var(--faint)}
+
+  /* bars list */
+  .brow{padding:11px 16px;border-bottom:1px solid var(--hair-soft)}
+  .brow:last-child{border-bottom:0}
+  .brow .l1{display:flex;align-items:baseline;justify-content:space-between;font-size:12.5px}
+  .brow .l1 .k{color:var(--ink)} .brow .l1 .v{color:var(--muted);font-variant-numeric:tabular-nums}
+  .brow .bar{height:5px;border-radius:999px;background:rgba(255,255,255,.05);margin-top:7px;overflow:hidden}
+  .brow .bar s{display:block;height:100%;border-radius:999px;text-decoration:none;background:rgba(255,255,255,.26)}
+  .brow .bar s.warn{background:rgba(232,180,94,.7)} .brow .bar s.bad{background:rgba(232,96,91,.7)}
+  .brow .l2{font-size:11px;color:var(--faint);margin-top:5px}
+
+  .drow{padding:12px 16px;border-bottom:1px solid var(--hair-soft);display:flex;align-items:center;gap:10px}
+  .drow:last-child{border-bottom:0}
+  .drow .col2{flex:1;min-width:0}
+  .drow .l1{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}
+  .drow .l1 .id{font-family:var(--mono);font-weight:500}
+  .drow .l1 .am{font-family:var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+  .drow .l2{font-size:11.5px;color:var(--faint);margin-top:3px}
+
+  /* bottom bar */
+  .bbar{display:flex;border-top:1px solid var(--hair);background:var(--card);padding:6px 4px 18px}
+  .bbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;
+    font-size:10px;color:var(--faint);text-decoration:none}
+  .bbar a.on{color:var(--amber)}
+  .bbar a s{text-decoration:none;display:block}
+
+  /* drawer */
+  .drawer{padding:0;background:var(--card);min-height:660px}
+  .dhead{padding:18px 18px 14px;border-bottom:1px solid var(--hair)}
+  .dhead .who{display:flex;align-items:center;gap:11px}
+  .dhead .who .av{width:38px;height:38px;border-radius:50%;background:var(--amber-dim);color:var(--amber);
+    display:grid;place-items:center;font-size:13px;font-weight:600}
+  .dhead .who .nm{font-size:14px;font-weight:600} .dhead .who .rl{font-size:11.5px;color:var(--faint)}
+  .dsearch{margin:14px 18px;height:40px;border:1px solid var(--hair);border-radius:11px;display:flex;
+    align-items:center;gap:9px;padding:0 12px;color:var(--faint);font-size:13px}
+  .dg{padding:10px 18px 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)}
+  .di{display:flex;align-items:center;gap:12px;padding:11px 18px;font-size:13.5px;color:var(--muted)}
+  .di.on{color:var(--amber);background:var(--amber-dim)}
+  .di .ch{margin-left:auto;color:var(--faint)}
+  .dsys{margin:12px 18px 18px;border-top:1px solid var(--hair);padding-top:14px;display:flex;
+    flex-direction:column;gap:12px}
+  .dsys .r{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+  .sw{width:36px;height:20px;border-radius:999px;background:var(--ok);position:relative}
+  .sw s{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#0e0d0b;text-decoration:none}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);
+     font-weight:500;padding:10px 12px;border-bottom:1px solid var(--hair)}
+  td{padding:11px 12px;border-bottom:1px solid var(--hair-soft);color:var(--muted);vertical-align:top}
+  td:first-child{color:var(--ink);font-weight:500;white-space:nowrap}
+  td b{color:var(--ink);font-weight:500}
+  tr:last-child td{border-bottom:0}
+
+  .q{counter-reset:q;display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .q .item{background:var(--card);border:1px solid var(--hair);border-left:2px solid var(--amber);
+    border-radius:0 12px 12px 0;padding:14px 18px}
+  .q .item h4{font-size:13px;font-weight:600;margin-bottom:5px}
+  .q .item p{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .q .item p em{color:var(--amber);font-style:normal;font-weight:500}
+
+  .note{background:var(--note-dim);border:1px solid var(--note-line);border-radius:12px;padding:14px 18px;
+    font-size:12.5px;color:#cfe0ef;line-height:1.6;margin-top:16px}
+  .note b{color:#fff;font-weight:600}
+  svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .sm svg{width:14px;height:14px}
+</style>
+
+<div class="wrap">
+
+<h1>PSP Mobile — структура дашборда</h1>
+<p class="lede">Сейчас на 375&nbsp;px приложение <b>не адаптировано вообще</b>: сайдбар жёстко занимает 264&nbsp;px, контенту остаётся ~110&nbsp;px, страница уезжает вбок. Значит начинаем не с «сожмём карточки», а с <b>оболочки</b> — навигация, топбар, тач-таргеты — и уже поверх неё раскладываем дашборд.</p>
+
+<div class="principle">
+  <div><strong>Задача мобилки</strong><p>Дашборд на телефоне отвечает на два вопроса за 5 секунд: <b style="color:var(--ink);font-weight:500">система жива?</b> и <b style="color:var(--ink);font-weight:500">что требует меня сейчас?</b> Всё остальное — на тап глубже.</p></div>
+  <div><strong>Не уменьшаем — переставляем</strong><p>Порядок блоков на мобилке отличается от десктопа: «Требует внимания» поднимается на 2-е место. На телефоне сначала смотрят «что горит», а не «какая конверсия».</p></div>
+  <div><strong>Одна карточка = одна работа</strong><p>Никаких двухколоночных карточек и таблиц. Вертикальный стек, у каждой карточки свой заголовок и «Все&nbsp;→».</p></div>
+  <div><strong>Ничего не выбрасываем</strong><p>Все 7 блоков остаются — меняется только их форма. Убираем лишь хлебные крошки, подзаголовок страницы и hover-тултипы (→ тап).</p></div>
+</div>
+
+<h2>Рефы — что смотрел и что берём</h2>
+<div class="refs">
+  <div class="ref"><h4>Stripe Dashboard (iOS)</h4><div class="cap">payments · мониторинг</div>
+    <p>Главный экран = одна геройская цифра оборота + переключатель периода, всё остальное — списком ниже. Никаких четырёх равнозначных плиток вверху.<br><b>Берём:</b> герой-оборот вместо сетки KPI.</p></div>
+  <div class="ref"><h4>Shopify Mobile — Home</h4><div class="cap">админка магазина</div>
+    <p>Карточка = одна работа, в шапке каждой «See all», вертикальный стек, между карточками воздух.<br><b>Берём:</b> анатомию карточки и «Все&nbsp;→» в каждом заголовке.</p></div>
+  <div class="ref"><h4>Revolut Business</h4><div class="cap">финтех</div>
+    <p>Сверху — деньги и то, что требует действия («money in motion»), аналитика ниже.<br><b>Берём:</b> «Требует внимания» поднимаем сразу под оборот.</p></div>
+  <div class="ref"><h4>Google Analytics (mobile)</h4><div class="cap">аналитика</div>
+    <p>Скоркарды 2×2 + карточка-график, сегменты периода стоят под заголовком во всю ширину, а не справа от него.<br><b>Берём:</b> позицию сегментов; 2×2 — как альтернатива для health.</p></div>
+  <div class="ref"><h4>Linear</h4><div class="cap">тон и плотность</div>
+    <p>Плотные списки без рамок, разделители-волоски, липкий фильтр сверху, всё на тёмном.<br><b>Берём:</b> плотность списков (диспуты, чеки, реквизиты) — она уже совпадает с нашим китом.</p></div>
+</div>
+
+<h2>Раскладка — 375&nbsp;px (рекомендуемая) · 320&nbsp;px · меню</h2>
+<p class="lede" style="margin-bottom:26px">Средняя детализация: реальные кегли, реальные числа, упрощённый график. Если структуру согласуем — вёрстка отсюда почти механическая.</p>
+
+<div class="phones">
+
+  <!-- ============ 375 ============ -->
+  <div class="col">
+    <div class="cap"><b>375 px</b> — iPhone, базовый макет</div>
+    <div class="phone w375">
+      <div class="mtop">
+        <div class="burger"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+        <div class="brand">psp <i>/ статистика</i></div>
+        <div class="sp"></div>
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><s class="dot"></s></div>
+        <div class="av">R</div>
+      </div>
+      <div class="mstrip"><span>87,64&nbsp;₽ / USDT</span><span class="sep">·</span><span class="on">● Авто-обработка</span></div>
+
+      <div class="msticky">
+        <div class="seg"><button class="on">Входящие</button><button>Исходящие</button></div>
+      </div>
+
+      <div class="body">
+        <div class="phrow">
+          <div class="ph">Статистика</div>
+          <div class="kebab"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div>
+        </div>
+
+        <!-- 1. hero -->
+        <div class="c">
+          <div class="lbl">Оборот за период</div>
+          <div class="hero tnum">116 024,00</div>
+          <div class="unitrow">
+            <span class="unit">USDT <svg style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            <span class="pill bad"><svg style="width:11px;height:11px" viewBox="0 0 24 24"><path d="M7 7l10 10M17 17V7"/></svg>0,1 %</span>
+          </div>
+          <div class="meta tnum">≈ 10 168 343 ₽ · 928 операций</div>
+          <div class="hr"></div>
+          <div class="h24">
+            <span class="l">За последние 24 часа</span>
+            <span class="r tnum">1 490 <i>USDT · 12 оп.</i></span>
+          </div>
+        </div>
+
+        <!-- 2. attention -->
+        <div class="c p0">
+          <div class="sect"><h5>Требует внимания</h5></div>
+          <div class="row"><span class="chip warn"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></span>
+            <span class="n warn">3</span><span class="t">открытых диспута</span>
+            <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="row"><span class="chip bad"><svg viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0zM12 9v4M12 17h.01"/></svg></span>
+            <span class="n bad">7</span><span class="t">реквизитов с конверсией&nbsp;&lt;&nbsp;50&nbsp;%</span>
+            <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="row"><span class="chip n"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M12 3l9 5H3z"/></svg></span>
+            <span class="n tnum">37 171</span><span class="t">баланс провайдеров, USDT</span>
+            <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        </div>
+
+        <!-- 3. health -->
+        <div class="c">
+          <div class="lbl">Конверсия</div>
+          <div class="conv">
+            <span class="big tnum">51,5<i>%</i></span>
+            <span class="pill bad" style="margin-bottom:4px"><svg style="width:11px;height:11px" viewBox="0 0 24 24"><path d="M7 7l10 10M17 17V7"/></svg>0,5 п.п.</span>
+            <span style="margin-left:auto;margin-bottom:5px;font-size:11.5px;color:var(--faint)" class="tnum">478 из 928</span>
+          </div>
+          <div class="splitbar"><s class="a" style="width:51.5%"></s><s class="b" style="flex:1"></s></div>
+          <div class="legs">
+            <div class="leg"><div class="k"><s style="background:var(--ok)"></s>Одобрено</div>
+              <div class="v tnum">58 395<i>USDT</i></div><div class="s tnum">478 оп.</div></div>
+            <div class="leg"><div class="k"><s style="background:rgba(232,96,91,.7)"></s>Отклонено</div>
+              <div class="v tnum">57 629<i>USDT</i></div><div class="s tnum">450 оп.</div></div>
+          </div>
+          <div class="queue"><span style="color:var(--warn)" class="sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="q1 tnum">В обработке — 4 120 USDT · 12 оп.</span>
+            <span class="q2">старейшая 6 мин</span></div>
+        </div>
+
+        <!-- 4. chart -->
+        <div class="c">
+          <div class="sect" style="padding:0 0 12px"><div><h5>Оборот по дням</h5><div class="sub">суммы по дням</div></div></div>
+          <div class="seg sm" style="margin-bottom:8px"><button>7 дн</button><button class="on">30 дн</button><button>365 дн</button></div>
+          <div class="seg sm"><button class="on">Все</button><button class="ok">Успешные</button><button class="no">Отклонённые</button></div>
+          <div class="chartsum"><b class="tnum">116 019</b><i>USDT за 30 дней · 60 % успешных</i></div>
+          <div class="chart">
+            <div class="b"><s class="r" style="height:14px"></s><s class="o" style="height:32px"></s></div>
+            <div class="b"><s class="r" style="height:22px"></s><s class="o" style="height:44px"></s></div>
+            <div class="b"><s class="r" style="height:18px"></s><s class="o" style="height:60px"></s></div>
+            <div class="b"><s class="r" style="height:30px"></s><s class="o" style="height:38px"></s></div>
+            <div class="b"><s class="r" style="height:12px"></s><s class="o" style="height:70px"></s></div>
+            <div class="b"><s class="r" style="height:26px"></s><s class="o" style="height:52px"></s></div>
+            <div class="b"><s class="r" style="height:20px"></s><s class="o" style="height:34px"></s></div>
+            <div class="b"><s class="r" style="height:34px"></s><s class="o" style="height:66px"></s></div>
+            <div class="b"><s class="r" style="height:16px"></s><s class="o" style="height:48px"></s></div>
+            <div class="b"><s class="r" style="height:24px"></s><s class="o" style="height:58px"></s></div>
+            <div class="b"><s class="r" style="height:28px"></s><s class="o" style="height:40px"></s></div>
+            <div class="b"><s class="r" style="height:15px"></s><s class="o" style="height:74px"></s></div>
+          </div>
+          <div class="xax"><span>1</span><span></span><span>6</span><span></span><span>11</span><span></span><span>16</span><span></span><span>21</span><span></span><span>26</span><span>30</span></div>
+        </div>
+
+        <!-- 5. buckets -->
+        <div class="c p0">
+          <div class="sect"><div><h5>Количество чеков</h5><div class="sub">по размеру · доля успешных</div></div><span class="all">Все →</span></div>
+          <div class="brow"><div class="l1"><span class="k">&lt; 10</span><span class="v">210 оп.</span></div>
+            <div class="bar"><s style="width:46%"></s></div><div class="l2 tnum">96 % успешных · 1 480 USDT</div></div>
+          <div class="brow"><div class="l1"><span class="k">10–30</span><span class="v">460 оп.</span></div>
+            <div class="bar"><s style="width:100%"></s></div><div class="l2 tnum">94 % успешных · 8 900 USDT</div></div>
+          <div class="brow"><div class="l1"><span class="k">30–100</span><span class="v">320 оп.</span></div>
+            <div class="bar"><s style="width:70%"></s></div><div class="l2 tnum">89 % успешных · 17 200 USDT</div></div>
+          <div class="brow"><div class="l1"><span class="k">100–3 000</span><span class="v">180 оп.</span></div>
+            <div class="bar"><s class="warn" style="width:39%"></s></div><div class="l2 tnum">72 % успешных · 96 400 USDT</div></div>
+          <div class="row" style="justify-content:center;color:var(--muted);font-size:12.5px;padding:12px">Ещё 2 диапазона</div>
+        </div>
+
+        <!-- 6. disputes -->
+        <div class="c p0">
+          <div class="sect"><div><h5>Диспуты · 3</h5><div class="sub">ждут решения оператора</div></div><span class="all">Все →</span></div>
+          <div class="drow"><div class="col2">
+            <div class="l1"><span class="id">DP-58170</span><span class="am">160,03 USDT</span></div>
+            <div class="l2">@alfa_desk · 18 мин назад</div></div>
+            <span class="ch sm" style="color:var(--faint)"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="drow"><div class="col2">
+            <div class="l1"><span class="id">DP-58204</span><span class="am">203,33 USDT</span></div>
+            <div class="l2">@ivex · 2 ч назад</div></div>
+            <span class="ch sm" style="color:var(--faint)"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="drow"><div class="col2">
+            <div class="l1"><span class="id">DP-57990</span><span class="am">244,10 USDT</span></div>
+            <div class="l2">@nova_pay · 5 ч назад</div></div>
+            <span class="ch sm" style="color:var(--faint)"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        </div>
+
+        <!-- 7. requisites -->
+        <div class="c p0">
+          <div class="sect"><div><h5>Реквизиты по успешности · 37</h5></div></div>
+          <div class="brow"><div class="l1"><span class="k">100 %</span><span class="v">4</span></div><div class="bar"><s style="width:36%"></s></div></div>
+          <div class="brow"><div class="l1"><span class="k">&gt; 90 %</span><span class="v">9</span></div><div class="bar"><s style="width:82%"></s></div></div>
+          <div class="brow"><div class="l1"><span class="k">&gt; 80 %</span><span class="v">6</span></div><div class="bar"><s style="width:55%"></s></div></div>
+          <div class="brow"><div class="l1"><span class="k">50–80 %</span><span class="v" style="color:var(--warn)">11</span></div><div class="bar"><s class="warn" style="width:100%"></s></div></div>
+          <div class="brow"><div class="l1"><span class="k">&lt; 50 %</span><span class="v" style="color:var(--bad)">7</span></div><div class="bar"><s class="bad" style="width:64%"></s></div></div>
+        </div>
+      </div>
+
+      <div class="bbar">
+        <a class="on"><s><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></s>Дашборд</a>
+        <a><s><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M16 12h3"/></svg></s>Депозиты</a>
+        <a><s><svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5M4 21h16"/></svg></s>Вывод</a>
+        <a><s><svg viewBox="0 0 24 24"><path d="M12 3v18M6 8l-3 7h6zM18 8l-3 7h6zM4 6h16"/></svg></s>Диспуты</a>
+        <a><s><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></s>Ещё</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 320 ============ -->
+  <div class="col">
+    <div class="cap"><b>320 px</b> — предел, тест на «влезает?»</div>
+    <div class="phone w320">
+      <div class="mtop" style="padding:0 12px;gap:9px">
+        <div class="burger" style="width:34px;height:34px"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+        <div class="brand" style="font-size:13px">psp <i>/ стат.</i></div>
+        <div class="sp"></div>
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><s class="dot"></s></div>
+        <div class="av">R</div>
+      </div>
+      <div class="mstrip" style="padding:0 14px;font-size:11px"><span>87,64&nbsp;₽</span><span class="sep">·</span><span class="on">● Авто</span></div>
+      <div class="msticky" style="padding:9px 14px">
+        <div class="seg"><button class="on" style="font-size:12.5px">Входящие</button><button style="font-size:12.5px">Исходящие</button></div>
+      </div>
+      <div class="body">
+        <div class="phrow"><div class="ph" style="font-size:20px">Статистика</div>
+          <div class="kebab"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></div></div>
+
+        <div class="c" style="padding:14px">
+          <div class="lbl" style="font-size:10.5px">Оборот за период</div>
+          <div class="hero tnum">116 024,00</div>
+          <div class="unitrow">
+            <span class="unit" style="font-size:12.5px">USDT <svg style="width:12px;height:12px" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            <span class="pill bad"><svg style="width:11px;height:11px" viewBox="0 0 24 24"><path d="M7 7l10 10M17 17V7"/></svg>0,1 %</span>
+          </div>
+          <div class="meta tnum" style="font-size:11.5px">≈ 10 168 343 ₽ · 928 операций</div>
+          <div class="hr" style="margin:12px -14px 0"></div>
+          <div class="h24"><span class="l" style="font-size:11.5px">За 24 часа</span>
+            <span class="r tnum" style="font-size:13.5px">1 490 <i>USDT · 12 оп.</i></span></div>
+        </div>
+
+        <div class="c p0">
+          <div class="sect" style="padding:13px 14px 3px"><h5>Требует внимания</h5></div>
+          <div class="row" style="padding:13px 14px;gap:10px"><span class="chip warn" style="width:28px;height:28px"><svg style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></span>
+            <span class="n warn">3</span><span class="t" style="font-size:12px">открытых диспута</span>
+            <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="row" style="padding:13px 14px;gap:10px"><span class="chip bad" style="width:28px;height:28px"><svg style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0zM12 9v4M12 17h.01"/></svg></span>
+            <span class="n bad">7</span><span class="t" style="font-size:12px">реквизитов&nbsp;&lt;&nbsp;50&nbsp;%</span>
+            <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="row" style="padding:13px 14px;gap:10px"><span class="chip n" style="width:28px;height:28px"><svg style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M12 3l9 5H3z"/></svg></span>
+            <span class="n tnum" style="font-size:14px">37 171</span><span class="t" style="font-size:12px">баланс провайдеров</span>
+            <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        </div>
+
+        <div class="c" style="padding:14px">
+          <div class="lbl" style="font-size:10.5px">Конверсия</div>
+          <div class="conv"><span class="big tnum" style="font-size:28px">51,5<i>%</i></span>
+            <span class="pill bad" style="margin-bottom:3px"><svg style="width:11px;height:11px" viewBox="0 0 24 24"><path d="M7 7l10 10M17 17V7"/></svg>0,5 п.п.</span>
+            <span style="margin-left:auto;margin-bottom:4px;font-size:11px;color:var(--faint)" class="tnum">478 из 928</span></div>
+          <div class="splitbar"><s class="a" style="width:51.5%"></s><s class="b" style="flex:1"></s></div>
+          <div class="legs" style="gap:10px">
+            <div class="leg"><div class="k" style="font-size:10.5px"><s style="background:var(--ok)"></s>Одобрено</div>
+              <div class="v tnum" style="font-size:15px">58 395<i>USDT</i></div><div class="s tnum">478 оп.</div></div>
+            <div class="leg"><div class="k" style="font-size:10.5px"><s style="background:rgba(232,96,91,.7)"></s>Отклонено</div>
+              <div class="v tnum" style="font-size:15px">57 629<i>USDT</i></div><div class="s tnum">450 оп.</div></div>
+          </div>
+          <div class="queue" style="margin:12px -14px -14px;padding:11px 14px">
+            <span style="color:var(--warn)" class="sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="q1 tnum" style="font-size:11.5px">В обработке 4 120 · 12 оп.</span>
+            <span class="q2" style="font-size:11px">6 мин</span></div>
+        </div>
+
+        <div class="c" style="padding:14px">
+          <div class="sect" style="padding:0 0 11px"><div><h5>Оборот по дням</h5></div></div>
+          <div class="seg sm" style="margin-bottom:7px"><button>7 дн</button><button class="on">30 дн</button><button>365 дн</button></div>
+          <div class="seg sm"><button class="on">Все</button><button class="ok">Успех</button><button class="no">Отказ</button></div>
+          <div class="chartsum"><b class="tnum" style="font-size:15px">116 019</b><i style="font-size:11px">USDT за 30 дней</i></div>
+          <div class="chart" style="height:112px;gap:3px">
+            <div class="b"><s class="r" style="height:12px"></s><s class="o" style="height:28px"></s></div>
+            <div class="b"><s class="r" style="height:19px"></s><s class="o" style="height:38px"></s></div>
+            <div class="b"><s class="r" style="height:15px"></s><s class="o" style="height:52px"></s></div>
+            <div class="b"><s class="r" style="height:26px"></s><s class="o" style="height:32px"></s></div>
+            <div class="b"><s class="r" style="height:10px"></s><s class="o" style="height:60px"></s></div>
+            <div class="b"><s class="r" style="height:22px"></s><s class="o" style="height:45px"></s></div>
+            <div class="b"><s class="r" style="height:17px"></s><s class="o" style="height:29px"></s></div>
+            <div class="b"><s class="r" style="height:29px"></s><s class="o" style="height:57px"></s></div>
+            <div class="b"><s class="r" style="height:14px"></s><s class="o" style="height:41px"></s></div>
+            <div class="b"><s class="r" style="height:21px"></s><s class="o" style="height:50px"></s></div>
+            <div class="b"><s class="r" style="height:24px"></s><s class="o" style="height:34px"></s></div>
+            <div class="b"><s class="r" style="height:13px"></s><s class="o" style="height:64px"></s></div>
+          </div>
+          <div class="xax" style="gap:3px"><span>1</span><span></span><span>6</span><span></span><span>11</span><span></span><span>16</span><span></span><span>21</span><span></span><span>26</span><span>30</span></div>
+        </div>
+
+        <div class="c p0">
+          <div class="sect" style="padding:13px 14px 3px"><div><h5>Количество чеков</h5></div><span class="all">Все →</span></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">&lt; 10</span><span class="v">210 оп.</span></div>
+            <div class="bar"><s style="width:46%"></s></div><div class="l2 tnum">96 % · 1 480 USDT</div></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">10–30</span><span class="v">460 оп.</span></div>
+            <div class="bar"><s style="width:100%"></s></div><div class="l2 tnum">94 % · 8 900 USDT</div></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">30–100</span><span class="v">320 оп.</span></div>
+            <div class="bar"><s style="width:70%"></s></div><div class="l2 tnum">89 % · 17 200 USDT</div></div>
+          <div class="row" style="justify-content:center;color:var(--muted);font-size:12px;padding:11px">Ещё 3 диапазона</div>
+        </div>
+
+        <div class="c p0">
+          <div class="sect" style="padding:13px 14px 3px"><div><h5>Диспуты · 3</h5></div><span class="all">Все →</span></div>
+          <div class="drow" style="padding:11px 14px"><div class="col2">
+            <div class="l1"><span class="id" style="font-size:12px">DP-58170</span><span class="am" style="font-size:12px">160,03 USDT</span></div>
+            <div class="l2">@alfa_desk · 18 мин</div></div>
+            <span class="ch sm" style="color:var(--faint)"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+          <div class="drow" style="padding:11px 14px"><div class="col2">
+            <div class="l1"><span class="id" style="font-size:12px">DP-58204</span><span class="am" style="font-size:12px">203,33 USDT</span></div>
+            <div class="l2">@ivex · 2 ч</div></div>
+            <span class="ch sm" style="color:var(--faint)"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        </div>
+
+        <div class="c p0">
+          <div class="sect" style="padding:13px 14px 3px"><div><h5>Реквизиты · 37</h5></div></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">100 %</span><span class="v">4</span></div><div class="bar"><s style="width:36%"></s></div></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">&gt; 90 %</span><span class="v">9</span></div><div class="bar"><s style="width:82%"></s></div></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">50–80 %</span><span class="v" style="color:var(--warn)">11</span></div><div class="bar"><s class="warn" style="width:100%"></s></div></div>
+          <div class="brow" style="padding:10px 14px"><div class="l1"><span class="k">&lt; 50 %</span><span class="v" style="color:var(--bad)">7</span></div><div class="bar"><s class="bad" style="width:64%"></s></div></div>
+        </div>
+      </div>
+      <div class="bbar" style="padding:5px 2px 16px">
+        <a class="on"><s><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></s>Дашборд</a>
+        <a><s><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M16 12h3"/></svg></s>Депозиты</a>
+        <a><s><svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5M4 21h16"/></svg></s>Вывод</a>
+        <a><s><svg viewBox="0 0 24 24"><path d="M12 3v18M6 8l-3 7h6zM18 8l-3 7h6zM4 6h16"/></svg></s>Диспуты</a>
+        <a><s><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></s>Ещё</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ drawer ============ -->
+  <div class="col">
+    <div class="cap"><b>Меню</b> — «Ещё» / бургер</div>
+    <div class="phone w320">
+      <div class="drawer">
+        <div class="dhead">
+          <div class="who"><span class="av">R</span><div><div class="nm">roman</div><div class="rl">Owner</div></div>
+            <span style="margin-left:auto;color:var(--faint)" class="sm"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></span></div>
+        </div>
+        <div class="dsearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Поиск по разделам</div>
+        <div class="dg">Операции</div>
+        <div class="di on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Дашборд</div>
+        <div class="di"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M12 3l9 5H3z"/></svg>Банки</div>
+        <div class="di"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M16 12h3"/></svg>Депозиты</div>
+        <div class="di"><svg viewBox="0 0 24 24"><path d="M12 3v13M7 12l5 5 5-5M4 21h16"/></svg>Вывод</div>
+        <div class="di"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Финансовый учёт</div>
+        <div class="di"><svg viewBox="0 0 24 24"><path d="M12 3v18M6 8l-3 7h6zM18 8l-3 7h6zM4 6h16"/></svg>Диспуты <span style="margin-left:8px;font-size:11px;color:var(--warn);background:var(--warn-dim);border-radius:999px;padding:1px 7px">3</span></div>
+        <div class="di"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/></svg>Провайдеры</div>
+        <div class="di"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2 20a7 7 0 0114 0M18 8h4M20 6v4"/></svg>Пользователи</div>
+        <div class="di"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2"/></svg>Партнёры</div>
+        <div class="dg">Администрирование</div>
+        <div class="di"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 4.5-3.4 7.3-8 8-4.6-.7-8-3.5-8-8V7z"/></svg>Управление <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="di"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.1A1.6 1.6 0 006.6 19l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.6 1.6 0 003 13.6H3a2 2 0 110-4h.1A1.6 1.6 0 004.9 8"/></svg>Настройки <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="di"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M2 20a7 7 0 0114 0"/></svg>Сотрудники <span class="ch sm"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="dsys">
+          <div class="r"><span>Авто-обработка</span><span class="sw"><s></s></span></div>
+          <div class="r"><span>Курс USDT</span><span class="tnum" style="color:var(--ink)">87,64 ₽</span></div>
+          <div class="r"><span>Тема</span><span style="color:var(--ink)">Тёмная</span></div>
+          <div class="r"><span>Язык</span><span style="color:var(--ink)">RU</span></div>
+          <div class="r" style="color:var(--bad)"><span>Выйти</span><span class="sm"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<h2>Развилка по блоку «Health»</h2>
+<p class="lede" style="margin-bottom:20px">Единственное место, где есть два честных варианта. Слева — то, что нарисовано в макете выше.</p>
+<div class="phones">
+  <div class="col">
+    <div class="cap"><b>Вариант A</b> — одна карточка-воронка <span style="color:var(--amber)">(рекомендую)</span></div>
+    <div style="width:343px">
+      <div class="c">
+        <div class="lbl">Конверсия</div>
+        <div class="conv"><span class="big tnum">51,5<i>%</i></span>
+          <span class="pill bad" style="margin-bottom:4px">↘ 0,5 п.п.</span>
+          <span style="margin-left:auto;margin-bottom:5px;font-size:11.5px;color:var(--faint)" class="tnum">478 из 928</span></div>
+        <div class="splitbar"><s class="a" style="width:51.5%"></s><s class="b" style="flex:1"></s></div>
+        <div class="legs">
+          <div class="leg"><div class="k"><s style="background:var(--ok)"></s>Одобрено</div>
+            <div class="v tnum">58 395<i>USDT</i></div><div class="s tnum">478 оп.</div></div>
+          <div class="leg"><div class="k"><s style="background:rgba(232,96,91,.7)"></s>Отклонено</div>
+            <div class="v tnum">57 629<i>USDT</i></div><div class="s tnum">450 оп.</div></div>
+        </div>
+        <div class="queue"><span class="q1 tnum">⏱ В обработке — 4 120 USDT · 12 оп.</span><span class="q2">старейшая 6 мин</span></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.6">Сохраняет причинную связь «одобрено ↔ отклонено = конверсия», которую даёт сплит-бар на десктопе. Одна карточка вместо четырёх — <b style="color:var(--ink);font-weight:500">≈ 210 px</b> вместо 320. Очередь отдельной строкой снизу, потому что это не метрика, а состояние.</p>
+    </div>
+  </div>
+  <div class="col">
+    <div class="cap"><b>Вариант B</b> — сетка 2×2, как на десктопе</div>
+    <div style="width:343px">
+      <div class="grid2">
+        <div class="tile"><div class="k"><span style="color:var(--amber)">◆</span>Конверсия</div><div class="v tnum">51,5<i>%</i></div><div class="s">↘ 0,5 п.п. · 478 из 928</div></div>
+        <div class="tile"><div class="k"><span style="color:var(--warn)">◆</span>В обработке</div><div class="v tnum">4 120<i>USDT</i></div><div class="s">12 оп. · 6 мин</div></div>
+        <div class="tile"><div class="k"><span style="color:var(--ok)">◆</span>Одобрено</div><div class="v tnum">58 395<i>USDT</i></div><div class="s">↗ 8,2 % · 478 оп.</div></div>
+        <div class="tile"><div class="k"><span style="color:var(--bad)">◆</span>Отклонено</div><div class="v tnum">57 629<i>USDT</i></div><div class="s">↗ 6,8 % · 450 оп.</div></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.6">Один-в-один десктопная анатомия — проще портировать в Figma и объяснять клиенту. Но: на 320&nbsp;px плитка = 145&nbsp;px, «58&nbsp;395&nbsp;USDT» на 24&nbsp;px уже впритык; теряется сплит-бар, а с ним — сама идея воронки. Четыре одинаковые плитки не расставляют приоритет.</p>
+    </div>
+  </div>
+</div>
+
+<h2>Брейкпоинты — план на весь проект</h2>
+<table>
+  <tr><th style="width:110px">Ширина</th><th style="width:150px">Навигация</th><th style="width:130px">Сетка</th><th>Что меняется</th></tr>
+  <tr><td>320–479<br><span style="color:var(--faint);font-weight:400;font-size:11px">обязательно</span></td><td>bottom-bar 5 + бургер-меню</td><td>1 колонка<br>отступ 14</td><td>Герой 32&nbsp;px, юнит и дельта переносятся под число. Сегменты — сокращённые подписи («Успех / Отказ»). «Чеки» свёрнуты до 3 строк.</td></tr>
+  <tr><td>480–767</td><td>bottom-bar 5 + бургер-меню</td><td>1 колонка<br>отступ 16</td><td>Герой 40&nbsp;px, полные подписи сегментов, все 6 диапазонов чеков раскрыты.</td></tr>
+  <tr><td>768–1023<br><span style="color:var(--faint);font-weight:400;font-size:11px">желательно</span></td><td>рельса 64&nbsp;px (иконки), bottom-bar убирается</td><td>2 колонки<br>отступ 24</td><td>Диспуты + Реквизиты встают парой. График 200&nbsp;px. Health возвращается в горизонтальную ленту.</td></tr>
+  <tr><td>1024–1279<br><span style="color:var(--faint);font-weight:400;font-size:11px">обязательно</span></td><td>рельса 64&nbsp;px, раскрывается по тапу</td><td>2–3 колонки<br>отступ 24</td><td>Появляется правая колонка топбара (курс, баланс, авто-обработка). Таблицы на других экранах — горизонтальный скролл с липкой первой колонкой.</td></tr>
+  <tr><td>1280–1439</td><td>сайдбар 264&nbsp;px раскрыт</td><td>3–4 колонки<br>отступ 32</td><td>Практически десктоп; герой 48&nbsp;px.</td></tr>
+  <tr><td>1440<br><span style="color:var(--faint);font-weight:400;font-size:11px">обязательно · эталон</span></td><td>сайдбар 264&nbsp;px</td><td>текущая сетка</td><td>Ничего не меняем — это то, что уже нарисовано и согласовано.</td></tr>
+  <tr><td>1920</td><td>сайдбар 264&nbsp;px</td><td>контент max&nbsp;1440, центр</td><td>Поля растут, макет не растягивается. <b>Вопрос&nbsp;№4</b> — возможно, для табличных экранов стоит разрешить до 1680.</td></tr>
+</table>
+
+<h2>Глобальные правила, которые придётся внести в кит</h2>
+<div class="principle" style="margin-top:0">
+  <div><strong>Тач-таргеты</strong><p>Минимум 44×44. Сейчас сегменты 24&nbsp;px, строки таблиц ~34&nbsp;px — на мобилке это промах. Строки-ссылки 48&nbsp;px+.</p></div>
+  <div><strong>Кегль полей ввода</strong><p>Все input на мобилке — <b style="color:var(--ink);font-weight:500">16&nbsp;px</b>, иначе iOS Safari зумит страницу при фокусе. Сейчас поля 13&nbsp;px.</p></div>
+  <div><strong>Нижний порог шрифта</strong><p>10–11&nbsp;px остаётся только на десктопе. На мобилке минимум 11&nbsp;px для мета-подписей, 12,5–13&nbsp;px для основного.</p></div>
+  <div><strong>Hover → tap</strong><p>Тултипы («?» у конверсии), подсказки графика, ховер-строки — на тач-устройствах переводим на тап + закрытие по тапу вне.</p></div>
+  <div><strong>Липкие элементы</strong><p>Топбар и переключатель Входящие/Исходящие — sticky. Он меняет все данные страницы, к нему возвращаются часто.</p></div>
+  <div><strong>Safe area</strong><p>Bottom-bar с <span class="mono" style="font-size:11px">env(safe-area-inset-bottom)</span> — иначе на iPhone он уедет под индикатор.</p></div>
+</div>
+
+<h2>Что решаем до вёрстки</h2>
+<div class="q">
+  <div class="item"><h4>1. Навигация: bottom-bar или только бургер?</h4>
+    <p>Предлагаю <em>bottom-bar из 5 пунктов</em> (Дашборд · Депозиты · Вывод · Диспуты · Ещё) + полное меню в шторке. Так частотные разделы в зоне большого пальца, а не в двух тапах. Минус: это веб, и в Safari нижняя панель браузера конкурирует с нашей — панель придётся прятать при скролле вниз. Альтернатива — <em>только бургер-шторка</em>: дешевле, ближе к десктопу, но каждый переход = 2 тапа.</p></div>
+  <div class="item"><h4>2. Порядок: «Требует внимания» поднимаем на 2-е место?</h4>
+    <p>На десктопе этот блок 4-й (после health). Предлагаю на мобилке поднять его <em>сразу под оборот</em>: с телефона заходят проверить «что горит», а не изучать конверсию. Если блок пустой — схлопывается в одну зелёную строку «Всё спокойно». Порядок на десктопе при этом не трогаем.</p></div>
+  <div class="item"><h4>3. Health: вариант A (воронка) или B (2×2)?</h4>
+    <p>Рекомендую <em>A</em> — сохраняет сплит-бар и смысл воронки, экономит ~110&nbsp;px. B проще портировать в Figma и объяснять клиенту. Решение влияет только на дашборд.</p></div>
+  <div class="item"><h4>4. График на 30 и 365 днях</h4>
+    <p>30 столбиков на 320&nbsp;px — это 7&nbsp;px на столбик. Варианты: <em>(а)</em> столбики оставить, но график скроллится вбок с минимальной шириной столбика 12&nbsp;px; <em>(б)</em> 7&nbsp;дн — столбики, 30/365&nbsp;дн — площадная линия; <em>(в)</em> на мобилке период по умолчанию 7&nbsp;дн и столбики всегда. Склоняюсь к <em>(б)</em>.</p></div>
+  <div class="item"><h4>5. Строка состояния под топбаром</h4>
+    <p>Курс 87,64&nbsp;₽ и «Авто-обработка» — держать их отдельной строкой 34&nbsp;px на всех экранах (как в макете) или убрать в шторку? Курс операторам нужен постоянно, авто-обработку в один тап на телефоне держать опасно — её я в любом случае оставляю в шторке.</p></div>
+  <div class="item"><h4>6. Потолок 1920</h4>
+    <p>Контент фиксируем на 1440 и центрируем (как сейчас) — или для табличных экранов (Депозиты, Вывод, Логи) разрешаем растянуться до 1680, чтобы влезало больше колонок?</p></div>
+</div>
+
+<div class="note"><b>Порядок работ после согласования:</b> оболочка (шторка + bottom-bar + мобильный топбар + тач-таргеты в ките) → дашборд → табличные экраны (там свой отдельный разговор: таблица на 320&nbsp;px превращается в список карточек, и это решение на 12 экранов сразу) → формы и попапы. Дашборд без оболочки сделать нельзя — сайдбар физически не отпускает ширину.</div>
+
+</div>
